@@ -40,7 +40,7 @@ export class UserServiceController {
     try {
       console.log('Received getUserByPhone request:', data);
       const user = await this.userService.getUserByPhone(data);
-      this.rmqService.ack(context);
+      // this.rmqService.ack(context);
       console.log('Sending response for getUserByPhone:', user);
       return user;
     } catch (error) {

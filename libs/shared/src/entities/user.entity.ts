@@ -43,7 +43,7 @@ export class UserEntity {
   @IsString()
   @IsStrongPassword()
   @IsNotEmpty()
-  @Column({ type: 'varchar', length: 16, nullable: false })
+  @Column({ type: 'varchar', length: 200, nullable: false })
   password: string;
 
   @ApiProperty()
