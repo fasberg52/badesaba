@@ -20,9 +20,10 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-    const user = await this.userClient
-      .send({ cmd: 'getUserByPhone' }, dto.phone)
-      .toPromise();
+    const user = await firstValueFrom(
+      this.userClient.send({ cmd: 'getUserByPhone' }, dto.phone),
+    );
+    console.log('User:', user);
 
     if (!user) throw new BadRequestException('کاربری با این مشخصات یافت نشد');
 

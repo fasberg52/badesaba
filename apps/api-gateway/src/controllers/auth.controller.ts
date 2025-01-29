@@ -24,10 +24,11 @@ export class AuthContoller {
   @Public()
   @Post('login')
   async login(@Body() data: LoginDto): Promise<TokenResponse> {
+    console.log(`data ${JSON.stringify(data)}`);
     try {
       const result = await firstValueFrom(
         this.authClient
-          .send(KEYS_RQM.USER_LOGIN, data)
+          .send({ cmd: KEYS_RQM.USER_LOGIN }, data)
           .pipe(retry({ count: 3, delay: 1000 })),
       );
       return new TokenResponse(result.token);
@@ -45,16 +46,13 @@ export class AuthContoller {
   @Post('signup')
   async signup(@Body() data: SignupDto): Promise<TokenResponse> {
     try {
-      console.log('Sending  request:', data);
       const result = await firstValueFrom(
         this.authClient
           .send({ cmd: KEYS_RQM.USER_SIGNUP }, data)
           .pipe(retry({ count: 3, delay: 1000 })),
       );
-      console.log('Received token response:', result);
       return new TokenResponse(result.token);
     } catch (error) {
-      console.error('Error during login:', error);
       const { message, statusCode } = error;
       throw new HttpException(
         message,

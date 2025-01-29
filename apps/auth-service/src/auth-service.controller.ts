@@ -12,6 +12,7 @@ export class AuthController {
 
   @MessagePattern({ cmd: KEYS_RQM.USER_LOGIN })
   async login(@Payload() data: LoginDto) {
+    console.log('Received login data:', data);
     try {
       return await this.authService.login(data);
     } catch (error) {

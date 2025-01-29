@@ -18,7 +18,7 @@ async function bootstrap() {
     }),
   );
   await app.startAllMicroservices();
-  await app.listen(process.env.port ?? 3002);
+  await app.listen(process.env.AUTH_SERVICE_PORT ?? 3002);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

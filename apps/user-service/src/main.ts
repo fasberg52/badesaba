@@ -30,7 +30,7 @@ async function bootstrap() {
     .catch((err) => {
       console.error('Error starting microservices', err);
     });
-  await app.listen(process.env.port ?? 3001);
+  await app.listen(process.env.USER_SERVICE_PORT ?? 3001);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
