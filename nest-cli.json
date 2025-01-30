@@ -108,6 +108,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/score-microservice/tsconfig.app.json"
       }
+    },
+    "spinner-microservice": {
+      "type": "application",
+      "root": "apps/spinner-microservice",
+      "entryFile": "main",
+      "sourceRoot": "apps/spinner-microservice/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/spinner-microservice/tsconfig.app.json"
+      }
     }
   }
 }

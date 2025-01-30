@@ -3,6 +3,7 @@ import { config as dotenvConfig } from 'dotenv';
 import { UserEntity } from './entities/user.entity';
 import { ReferralEntity } from './entities/referral.entity';
 import { ScoreEntity } from './entities/score.entity';
+import { PrizeEntity } from './entities/prize.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -13,7 +14,7 @@ export const datasource = new DataSource({
   username: process.env.DATABASE_USERNAME,
   database: process.env.DATABASE_NAME,
   password: `${process.env.DATABASE_PASSWORD}`,
-  entities: [UserEntity, ReferralEntity, ScoreEntity],
+  entities: [UserEntity, ReferralEntity, ScoreEntity, PrizeEntity],
   migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,
   logging: true,

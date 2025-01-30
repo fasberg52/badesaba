@@ -8,6 +8,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToMany,
+  JoinColumn,
+  JoinTable,
 } from 'typeorm';
 import { ReferralEntity } from './referral.entity';
 import * as bcrypt from 'bcrypt';
@@ -25,6 +28,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ScoreEntity } from './score.entity';
+import { PrizeEntity } from './prize.entity';
 
 @Entity({ name: 'users', schema: 'user' })
 export class UserEntity {
@@ -85,6 +89,15 @@ export class UserEntity {
 
   @OneToMany(() => ScoreEntity, (score) => score.user)
   scores: Relation<ScoreEntity[]>;
+
+  @ManyToMany(() => PrizeEntity, (prize) => prize.users)
+  @JoinTable({
+    schema: 'spinner',
+    name: 'user_prizes',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'prizeId', referencedColumnName: 'id' },
+  })
+  prizes: PrizeEntity[];
 
   @BeforeInsert()
   async hashPassword() {
