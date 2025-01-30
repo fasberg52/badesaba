@@ -13,8 +13,8 @@ export class ReferralService {
     @Inject(USER_SERVICE) private userClient: ClientProxy,
   ) {}
 
-  async useReferral(data: ReferralDto) {
-    const { referralCode, referredUserId } = data;
+  async useReferral(referralDto: ReferralDto & { referredUserId: number }) {
+    const { referredUserId, referralCode } = referralDto;
     const referrer = await firstValueFrom(
       this.userClient.send(
         { cmd: KEYS_RQM.GET_USER_BY_REFERRAL_CODE },

@@ -1,6 +1,8 @@
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { REFERRAL_SERVICE } from '@app/shared/constants/name-microservice';
+import { User } from '@app/shared/decorators/user.decorator';
 import { ReferralDto } from '@app/shared/dtos/referrals/referral.dto';
+import { UserEntity } from '@app/shared/entities/user.entity';
 import { MessageResponse } from '@app/shared/response/base.response';
 import {
   Body,
@@ -23,10 +25,14 @@ export class ReferralController {
   @Post('use')
   async useReferral(
     @Body() referralDto: ReferralDto,
+    @User() user: UserEntity,
   ): Promise<MessageResponse> {
     try {
       const result = await firstValueFrom(
-        this.referralClient.send({ cmd: KEYS_RQM.USE_REFERRAL }, referralDto),
+        this.referralClient.send(
+          { cmd: KEYS_RQM.USE_REFERRAL },
+          { referralCode: referralDto.referralCode, referredUserId: user.id },
+        ),
       );
       return new MessageResponse('با موفقیت انجام شد');
     } catch (error) {
