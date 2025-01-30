@@ -24,6 +24,7 @@ import {
   Max,
   MaxLength,
 } from 'class-validator';
+import { ScoreEntity } from './score.entity';
 
 @Entity({ name: 'users', schema: 'user' })
 export class UserEntity {
@@ -81,6 +82,9 @@ export class UserEntity {
 
   @OneToMany(() => ReferralEntity, (referral) => referral.referred)
   referralsReceived: Relation<ReferralEntity[]>;
+
+  @OneToMany(() => ScoreEntity, (score) => score.user)
+  scores: Relation<ScoreEntity[]>;
 
   @BeforeInsert()
   async hashPassword() {

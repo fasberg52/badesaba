@@ -27,7 +27,7 @@
     "migration:create-linux": "typeorm-ts-node-commonjs migration:create libs/shared/src/migrations/$npm_config_name",
     "migration:generate": "typeorm migration:generate -n",
     "migration:run": "npx ts-node libs/shared/src/run-migrations.ts",
-    "migration:revert": "npx ts-node libs/shared/src/revert-migrations.ts"
+    "migration:revert": "npx ts-node libs/shared/src/revert-migration.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
