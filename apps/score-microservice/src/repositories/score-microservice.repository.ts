@@ -13,7 +13,7 @@ export class ScoreRepository extends Repository<ScoreEntity> {
     super(ScoreEntity, dataSource.createEntityManager());
   }
 
-  async findUserScores(user: Partial<ScoreEntity>): Promise<ScoreEntity[]> {
+  async findUserScores(user: Partial<UserEntity>): Promise<ScoreEntity[]> {
     const userId = user.id;
     return this.find({ where: { userId: userId } });
   }

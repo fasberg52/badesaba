@@ -11,6 +11,7 @@ import {
   Index,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { Transform } from 'class-transformer';
 
 @Entity({ schema: 'score', name: 'scores' })
 @Index('IDX_SCORE_USER_ID', ['userId'])
@@ -19,6 +20,7 @@ export class ScoreEntity {
   id: number;
 
   @ApiProperty()
+  @Transform(({ value }) => Number(value))
   @Column({ type: 'bigint', default: 0 })
   score: number;
 

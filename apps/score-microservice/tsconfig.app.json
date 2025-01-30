@@ -2,7 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": false,
-    "outDir": "../../dist/apps/socre-microservice"
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "outDir": "../../dist/apps/score-microservice"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]

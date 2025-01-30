@@ -6,13 +6,20 @@ import { datasource } from '@app/shared/config';
 import { ConfigModule } from '@nestjs/config';
 import { ReferralRepository } from './repository/referral.repository';
 import { RmqModule } from '@app/shared/rmq/rmq.module';
-import { REFERRAL_SERVICE, USER_SERVICE } from '@app/shared/constants/name-microservice';
+import {
+  REFERRAL_SERVICE,
+  SCORE_SERVICE,
+  USER_SERVICE,
+} from '@app/shared/constants/name-microservice';
 
 const repository = [ReferralRepository];
 @Module({
   imports: [
     RmqModule.register({
       name: USER_SERVICE,
+    }),
+    RmqModule.register({
+      name: SCORE_SERVICE,
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({

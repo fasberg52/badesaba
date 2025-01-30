@@ -100,13 +100,13 @@
         "tsConfigPath": "apps/referral-service/tsconfig.app.json"
       }
     },
-    "socre-microservice": {
+    "score-microservice": {
       "type": "application",
-      "root": "apps/socre-microservice",
+      "root": "apps/score-microservice",
       "entryFile": "main",
-      "sourceRoot": "apps/socre-microservice/src",
+      "sourceRoot": "apps/score-microservice/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/socre-microservice/tsconfig.app.json"
+        "tsConfigPath": "apps/score-microservice/tsconfig.app.json"
       }
     }
   }

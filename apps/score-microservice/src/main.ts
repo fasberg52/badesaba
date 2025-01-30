@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
-import { SocreMicroserviceModule } from './socre-microservice.module';
 import { ValidationPipe } from '@nestjs/common';
 import { RmqOptions } from '@nestjs/microservices';
 import { RmqService } from '@app/shared/rmq/rmq.service';
+import { ScoreMicroserviceModule } from './score-microservice.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(SocreMicroserviceModule);
+  const app = await NestFactory.create(ScoreMicroserviceModule);
   const rmqService = app.get<RmqService>(RmqService);
 
-  app.connectMicroservice<RmqOptions>(rmqService.getOptions('Score', true));
+  app.connectMicroservice<RmqOptions>(rmqService.getOptions('SCORE', true));
 
   app.useGlobalPipes(
     new ValidationPipe({

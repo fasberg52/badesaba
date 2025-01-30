@@ -1,5 +1,8 @@
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
-import { USER_SERVICE } from '@app/shared/constants/name-microservice';
+import {
+  SCORE_SERVICE,
+  USER_SERVICE,
+} from '@app/shared/constants/name-microservice';
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
 import { UserRoleEnum } from '@app/shared/enums/role.enum';
@@ -17,6 +20,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @Inject(USER_SERVICE) private userClient: ClientProxy,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
   ) {}
 
   async login(dto: LoginDto) {
@@ -53,6 +57,12 @@ export class AuthService {
       )
       .toPromise();
 
+    const addScore = await this.scoreClient
+      .emit(
+        { cmd: KEYS_RQM.ADD_POINTS_TO_USER },
+        { userId: user.id, score: 1 },
+      )
+      .toPromise();
     const token = await this.generateToken(user);
     return { token };
   }
