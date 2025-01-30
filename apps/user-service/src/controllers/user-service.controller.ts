@@ -8,6 +8,7 @@ import {
   RpcException,
 } from '@nestjs/microservices';
 import { RmqService } from '@app/shared/rmq/rmq.service';
+import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 
 @Controller()
 export class UserServiceController {
@@ -26,8 +27,8 @@ export class UserServiceController {
     }
   }
 
-  @MessagePattern({ cmd: 'getUserById' })
-  async getUserById(@Payload() data: any) {
+  @MessagePattern({ cmd: KEYS_RQM.GET_USER_BY_ID })
+  async getUserById(@Payload() data: number) {
     try {
       return await this.userService.getUserById(data);
     } catch (error) {
@@ -45,6 +46,15 @@ export class UserServiceController {
       return user;
     } catch (error) {
       console.error('Error in getUserByPhone:', error.message);
+      throw new RpcException(error.message);
+    }
+  }
+
+  @MessagePattern({ cmd: KEYS_RQM.GET_USER_BY_REFERRAL_CODE })
+  async getUserByReferralCode(@Payload() data: string) {
+    try {
+      return await this.userService.getUserByReferralCode(data);
+    } catch (error) {
       throw new RpcException(error.message);
     }
   }

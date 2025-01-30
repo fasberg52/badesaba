@@ -33,4 +33,10 @@ export class UserService {
     console.log('User by phone:', user);
     return user ?? null;
   }
+
+
+  async getUserByReferralCode(referralCode: string) {
+    const user = await this.userRepository.findOneBy({ referralCode });
+    return user;
+  }
 }

@@ -6,24 +6,26 @@ import { RoleGuard } from '@app/auth/guards/role.guard';
 import { JwtGuard } from '@app/auth/guards/jwt.gaurd';
 import { AuthModule } from '@app/auth';
 import { RmqModule } from '@app/shared/rmq/rmq.module';
-import { AUTH_SERVICE } from '@app/shared/constants/name-microservice';
+import { AUTH_SERVICE, REFERRAL_SERVICE } from '@app/shared/constants/name-microservice';
+import { ReferralController } from './controllers/referral.controller';
 
 @Module({
   imports: [
     RmqModule.register({
       name: AUTH_SERVICE,
     }),
-
+    RmqModule.register({
+      name: REFERRAL_SERVICE,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
   ],
-  controllers: [AuthContoller],
+  controllers: [AuthContoller, ReferralController],
   providers: [
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
-
     {
       provide: APP_GUARD,
       useClass: RoleGuard,
