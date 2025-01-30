@@ -90,6 +90,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/auth-service/tsconfig.app.json"
       }
+    },
+    "referral-service": {
+      "type": "application",
+      "root": "apps/referral-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/referral-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/referral-service/tsconfig.app.json"
+      }
     }
   }
 }
