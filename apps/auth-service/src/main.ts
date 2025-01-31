@@ -3,6 +3,7 @@ import { AuthServiceModule } from './auth-service.module';
 import { RmqService } from '@app/shared/rmq/rmq.service';
 import { RmqOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
+import { CustomRpcExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthServiceModule);
@@ -17,6 +18,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalFilters(new CustomRpcExceptionFilter());
   await app.startAllMicroservices();
   await app.listen(process.env.AUTH_SERVICE_PORT ?? 3002);
   console.log(`Application is running on: ${await app.getUrl()}`);

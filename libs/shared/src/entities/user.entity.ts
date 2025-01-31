@@ -29,6 +29,7 @@ import {
 } from 'class-validator';
 import { ScoreEntity } from './score.entity';
 import { PrizeEntity } from './prize.entity';
+import { UserPrizeEntity } from './user-prize.entity';
 
 @Entity({ name: 'users', schema: 'user' })
 export class UserEntity {
@@ -90,14 +91,8 @@ export class UserEntity {
   @OneToMany(() => ScoreEntity, (score) => score.user)
   scores: Relation<ScoreEntity[]>;
 
-  @ManyToMany(() => PrizeEntity, (prize) => prize.users)
-  @JoinTable({
-    schema: 'spinner',
-    name: 'user_prizes',
-    joinColumn: { name: 'userId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'prizeId', referencedColumnName: 'id' },
-  })
-  prizes: PrizeEntity[];
+  @OneToMany(() => UserPrizeEntity, (userPrize) => userPrize.user)
+  userPrizes: UserPrizeEntity[];
 
   @BeforeInsert()
   async hashPassword() {

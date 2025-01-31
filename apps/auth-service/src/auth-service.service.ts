@@ -6,10 +6,10 @@ import {
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
 import { UserRoleEnum } from '@app/shared/enums/role.enum';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { UserService } from 'apps/user-service/src/services/user-service.service';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom, lastValueFrom, Observable, retry } from 'rxjs';
@@ -32,7 +32,11 @@ export class AuthService {
     if (!user) throw new BadRequestException('کاربری با این مشخصات یافت نشد');
 
     const isValidPassword = await bcrypt.compare(dto.password, user.password);
-    if (!isValidPassword) throw new BadRequestException('رمز عبور اشتباه است');
+    if (!isValidPassword)
+      throw new RpcException({
+        message: 'sرمز عبور اشتباه است',
+        statusCode: HttpStatus.UNAUTHORIZED,
+      });
 
     const token = await this.generateToken(user);
     return { token };
@@ -58,10 +62,7 @@ export class AuthService {
       .toPromise();
 
     const addScore = await this.scoreClient
-      .emit(
-        { cmd: KEYS_RQM.ADD_POINTS_TO_USER },
-        { userId: user.id, score: 1 },
-      )
+      .emit({ cmd: KEYS_RQM.ADD_POINTS_TO_USER }, { userId: user.id, score: 1 })
       .toPromise();
     const token = await this.generateToken(user);
     return { token };

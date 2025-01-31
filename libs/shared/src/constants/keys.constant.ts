@@ -6,4 +6,5 @@ export const KEYS_RQM = {
   GET_USER_BY_ID: 'get.user.by.id',
   ADD_POINTS_TO_USER: 'add.points.to.user',
   LOWER_POINTS_FROM_USER: 'lower.points.from.user',
+  RUN_SPINNER: 'run.spinner',
 };

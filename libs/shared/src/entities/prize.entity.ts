@@ -4,11 +4,13 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { PrizeTypeEnum } from '../enums/prize.enum';
 import { UserEntity } from './user.entity';
+import { UserPrizeEntity } from './user-prize.entity';
 
 @Entity({ schema: 'spinner', name: 'prizes' })
 export class PrizeEntity {
@@ -37,6 +39,6 @@ export class PrizeEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToMany(() => UserEntity, (user) => user.prizes)
-  users: UserEntity[];
+  @OneToMany(() => UserPrizeEntity, (userPrize) => userPrize.prize)
+  userPrizes: UserPrizeEntity[];
 }

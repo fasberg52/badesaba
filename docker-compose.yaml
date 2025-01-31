@@ -1,0 +1,196 @@
+version: '3.8'
+services:
+  api-gateway:
+    image: api-gateway
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+      - RMQ_URL=amqp://rabbitmq:5672
+      - DATABASE_HOST=localhost
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - SWAGGER_PATH=/swagger
+      - SWAGGER_USERNAME=taherian
+      - SWAGGER_PASSWORD=123456
+      - SWAGGER_TITLE='Message App'
+      - SWAGGER_DESCRIPTION='MRT developer'
+
+    depends_on:
+      - user-service
+      - auth-service
+      - referral-service
+      - spinner-microservice
+      - score-microservice
+      - rabbitmq
+    networks:
+      - badesaba-network
+    command: >
+      sh -c "npm run migration:run && npm run start:dev api-gateway"
+
+  user-service:
+    image: user-service
+    build:
+      context: .
+      dockerfile: ./apps/user-service/Dockerfile
+    ports:
+      - '3001:3001'
+    environment:
+      - RMQ_URL=amqp://rabbitmq:5672
+      - RMQ_USER_QUEUE=user-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - USER_SERVICE_PORT=3001
+
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - badesaba-network
+    command: npm run start:dev user-service
+
+  auth-service:
+    image: auth-service
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+    ports:
+      - '3002:3002'
+
+    environment:
+      - RMQ_URL=amqp://rabbitmq:5672
+      - RMQ_AUTH_QUEUE=auth-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - AUTH_SERVICE_PORT=3002
+
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - badesaba-network
+    command: npm run start:dev auth-service
+
+  referral-service:
+    image: referral-service
+    build:
+      context: .
+      dockerfile: ./apps/referral-service/Dockerfile
+    ports:
+      - '3003:3003'
+    environment:
+      - RMQ_URL=amqp://rabbitmq:5672
+      - RMQ_REFERRAL_QUEUE=referral-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - REFERRAL_SERVICE_PORT=3003
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - badesaba-network
+    command: npm run start:dev referral-service
+
+  score-microservice:
+    image: score-microservice
+    build:
+      context: .
+      dockerfile: ./apps/score-microservice/Dockerfile
+    ports:
+      - '3004:3004'
+    environment:
+      - RMQ_URL=amqp://rabbitmq:5672
+      - RMQ_SCORE_QUEUE=score-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - SCORE_SERVICE_PORT=3004
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - badesaba-network
+    command: npm run start:dev score-microservice
+
+  spinner-microservice:
+    image: spinner-microservice
+    build:
+      context: .
+      dockerfile: ./apps/spinner-microservice/Dockerfile
+    ports:
+      - '3005:3005'
+    environment:
+      - RMQ_URL=amqp://rabbitmq:5672
+      - RMQ_SPINNER_QUEUE=spinner-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - SPINNER_SERVICE_PORT=3005
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - badesaba-network 
+    command: npm run start:dev spinner-microservice
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2434127reza
+      POSTGRES_DB: badesaba
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - badesaba-network
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    restart: always
+    hostname: rabbitmq
+    ports:
+      - '5673:5672'
+      - '15673:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - badesaba-network
+
+networks:
+  badesaba-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
