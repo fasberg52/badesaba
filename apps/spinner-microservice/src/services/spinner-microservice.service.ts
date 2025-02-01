@@ -13,9 +13,12 @@ import { PrizeRepository } from '../repositories/prize.repository';
 import { first, firstValueFrom } from 'rxjs';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { PrizeTypeEnum } from '@app/shared/enums/prize.enum';
-import { In, Not } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, In, Not } from 'typeorm';
 import { UserPrizeRepository } from '../repositories/user-prize.repository';
 import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
+import { GetAllPrizesByUserDto } from '@app/shared/dtos/spinner/get-all-prizes.dto';
+import { applySortingToFindOptions } from '@app/shared/factory/sort.factory';
+import { PrizeEntity } from '@app/shared/entities/prize.entity';
 
 @Injectable()
 export class SpinnerMicroserviceService {
@@ -90,12 +93,9 @@ export class SpinnerMicroserviceService {
 
       for (const prize of availablePrizes) {
         cumulativeWeight += prize.weight;
-        console.log(
-          `Checking prize: ${prize.name} | Weight: ${prize.weight} | Cumulative: ${cumulativeWeight}\n`,
-        );
+
         if (random < cumulativeWeight) {
           selectedPrize = prize;
-          console.log(`Selected Prize: ${JSON.stringify(selectedPrize)}\n`);
 
           break;
         }
@@ -114,8 +114,40 @@ export class SpinnerMicroserviceService {
 
       return selectedPrize;
     } catch (error) {
-      console.error('Error in runSpinner:', error);
-      throw new RpcException(error.message || 'Unknown error occurred');
+      throw new RpcException(error.message || 'Unknown error');
     }
+  }
+
+  async getUserPrizes(
+    dto: GetAllPrizesByUserDto & { userId: number },
+  ): Promise<[UserPrizeEntity[], number]> {
+    const { page, limit, type, sort, sortBy, userId } = dto;
+    const where: FindOptionsWhere<UserPrizeEntity> = { userId };
+    if (type) {
+      where.prize = { type };
+    }
+
+    let options: FindManyOptions<UserPrizeEntity> = {
+      where,
+      relations: { prize: true },
+      select: {
+        userId: true,
+        prizeId: true,
+        wonAt: true,
+        prize: {
+          id: true,
+          name: true,
+          type: true,
+          weight: true,
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    };
+    options = applySortingToFindOptions(options, sort, sortBy, 'id', 'DESC');
+
+    const [userPrizes, count] =
+      await this.userPrizeRepository.findAndCount(options);
+    return [userPrizes, count];
   }
 }

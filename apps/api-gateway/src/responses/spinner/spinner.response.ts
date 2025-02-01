@@ -1,8 +1,7 @@
 import { PrizeEntity } from '@app/shared/entities/prize.entity';
-import { BaseResponse } from '@app/shared/response/base.response';
+import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
+import { BaseResponse, Pagination } from '@app/shared/response/base.response';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
-
 
 @ApiExtraModels()
 export class SpinnerResponse extends BaseResponse {
@@ -14,3 +13,15 @@ export class SpinnerResponse extends BaseResponse {
   }
 }
 
+@ApiExtraModels()
+export class UserPrizeListResponse extends BaseResponse {
+  result: UserPrizeEntity[];
+
+  @ApiProperty()
+  pagination: Pagination;
+  constructor(result: UserPrizeEntity[], total: number) {
+    super();
+    this.result = result;
+    this.pagination = Pagination.set({ total });
+  }
+}

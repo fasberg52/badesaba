@@ -8,4 +8,5 @@ export const KEYS_RQM = {
   LOWER_POINTS_FROM_USER: 'lower.points.from.user',
   RUN_SPINNER: 'run.spinner',
   GET_SCORE_BY_USER_ID: 'get.score.by.user.id',
+  GET_DETAIL_PRIZES_USER: 'get.detail.prizes.user',
 };
