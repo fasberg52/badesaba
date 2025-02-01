@@ -76,7 +76,7 @@ export class CreateTablePrizeEntity1738246928483 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('user_prizes');
-    await queryRunner.dropTable('prizes');
+    await queryRunner.dropTable('user_prizes', true, true, true);
+    await queryRunner.dropTable('prizes', true, true, true);
   }
 }

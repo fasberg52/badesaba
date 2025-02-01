@@ -5,6 +5,7 @@ import { ReferralEntity } from './entities/referral.entity';
 import { ScoreEntity } from './entities/score.entity';
 import { PrizeEntity } from './entities/prize.entity';
 import { UserPrizeEntity } from './entities/user-prize.entity';
+import { PaymentEntity } from './entities/payment.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -21,6 +22,7 @@ export const datasource = new DataSource({
     ScoreEntity,
     PrizeEntity,
     UserPrizeEntity,
+    PaymentEntity,
   ],
   migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,

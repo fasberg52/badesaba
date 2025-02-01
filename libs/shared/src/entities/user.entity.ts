@@ -30,6 +30,7 @@ import {
 import { ScoreEntity } from './score.entity';
 import { PrizeEntity } from './prize.entity';
 import { UserPrizeEntity } from './user-prize.entity';
+import { PaymentEntity } from './payment.entity';
 
 @Entity({ name: 'users', schema: 'user' })
 export class UserEntity {
@@ -92,7 +93,10 @@ export class UserEntity {
   scores: Relation<ScoreEntity[]>;
 
   @OneToMany(() => UserPrizeEntity, (userPrize) => userPrize.user)
-  userPrizes: UserPrizeEntity[];
+  userPrizes: Relation<UserPrizeEntity[]>;
+
+  @OneToMany(() => PaymentEntity, (payment) => payment.user)
+  payments: Relation<PaymentEntity[]>;
 
   @BeforeInsert()
   async hashPassword() {
