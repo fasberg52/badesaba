@@ -11,6 +11,8 @@ import {
   SCORE_SERVICE,
   USER_SERVICE,
 } from '@app/shared/constants/name-microservice';
+import { APP_FILTER } from '@nestjs/core';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 const repository = [ReferralRepository];
 @Module({
@@ -33,7 +35,14 @@ const repository = [ReferralRepository];
     }),
   ],
   controllers: [ReferralController],
-  providers: [...repository, ReferralService],
+  providers: [
+    ...repository,
+    ReferralService,
+    {
+      provide: APP_FILTER,
+      useClass: RpcToHttpExceptionFilter,
+    },
+  ],
   exports: [...repository, ReferralService],
 })
 export class ReferralServiceModule {}

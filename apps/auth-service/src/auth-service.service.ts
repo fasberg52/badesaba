@@ -1,3 +1,4 @@
+import { BadRequestRpcException } from './../../../libs/shared/src/filters/custom-rpc-exception/custm-rpc-exception';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import {
   SCORE_SERVICE,
@@ -6,6 +7,7 @@ import {
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
 import { UserRoleEnum } from '@app/shared/enums/role.enum';
+import { ConfilctRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 import {
   BadRequestException,
   HttpStatus,
@@ -34,14 +36,12 @@ export class AuthService {
     );
     console.log('User:', user);
 
-    if (!user) throw new BadRequestException('کاربری با این مشخصات یافت نشد');
+    if (!user)
+      throw new ConfilctRpcException('نام کاربری یا رمز عبور اشتباه است');
 
     const isValidPassword = await bcrypt.compare(dto.password, user.password);
     if (!isValidPassword)
-      throw new RpcException({
-        message: 'sرمز عبور اشتباه است',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
+      throw new ConfilctRpcException('نام کاربری یا رمز عبور اشتباه است');
 
     const token = await this.generateToken(user);
     return { token };
@@ -54,7 +54,7 @@ export class AuthService {
     );
     console.log('Existing user:', existingUser);
     if (existingUser)
-      throw new BadRequestException('این کاربر از قبل وجود دارد');
+      throw new BadRequestRpcException('این کاربر از قبل وجود دارد');
     console.log('Creating user:', dto);
     const user = await this.userClient
       .send(

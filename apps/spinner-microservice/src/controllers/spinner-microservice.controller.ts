@@ -28,7 +28,11 @@ export class SpinnerMicroserviceController {
       console.log(`data >>> ${JSON.stringify(data)}`);
       return this.spinnerMicroserviceService.getUserPrizes(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      console.error('error in getDetailPrizesUser:', error);
+      throw new RpcException({
+        message: error.message || 'Internal Server Error',
+        statusCode: error.statusCode || 500,
+      });
     }
   }
 }

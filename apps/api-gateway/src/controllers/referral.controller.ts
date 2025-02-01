@@ -36,10 +36,7 @@ export class ReferralController {
       );
       return new MessageResponse('با موفقیت انجام شد');
     } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+     throw error;
     }
   }
 }

@@ -13,7 +13,7 @@ export class ReferralController {
     try {
       return await this.referralService.useReferral(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error;
     }
   }
 }

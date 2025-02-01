@@ -4,6 +4,10 @@ import { RpcException } from '@nestjs/microservices';
 import { ScoreUserDto } from '@app/shared/dtos/score/score.dto';
 import { ScoreEntity } from '@app/shared/entities/score.entity';
 import { plainToInstance } from 'class-transformer';
+import {
+  BadRequestRpcException,
+  NotFoundRpcException,
+} from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class ScoreMicroserviceService {
@@ -14,7 +18,7 @@ export class ScoreMicroserviceService {
       const { userId, score } = scoreDto;
       const numericScore = Number(score);
       if (isNaN(numericScore)) {
-        throw new RpcException('امتیاز باید عدد معتبر باشد');
+        throw new BadRequestRpcException('امتیاز باید عدد معتبر باشد');
       }
       let userScore = await this.scoreRepository.findOne({ where: { userId } });
 
@@ -30,10 +34,7 @@ export class ScoreMicroserviceService {
       await this.scoreRepository.save(userScore);
       return userScore;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'unknown error';
-
-      throw new RpcException(errorMessage);
+      throw error;
     }
   }
 
@@ -42,7 +43,7 @@ export class ScoreMicroserviceService {
       let userScore = await this.scoreRepository.findOne({ where: { userId } });
 
       if (!userScore) {
-        throw new RpcException('کاربر یافت نشد');
+        throw new NotFoundRpcException('کاربر یافت نشد');
       }
 
       userScore.score -= score;
@@ -50,10 +51,7 @@ export class ScoreMicroserviceService {
       console.log('User score:', userScore);
       return userScore;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'unknown error';
-
-      throw new RpcException(errorMessage);
+      throw error;
     }
   }
 

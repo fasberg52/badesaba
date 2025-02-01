@@ -3,7 +3,7 @@ import { SpinnerMicroserviceModule } from './spinner-microservice.module';
 import { RmqService } from '@app/shared/rmq/rmq.service';
 import { RmqOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
-import { CustomRpcExceptionFilter } from '@app/shared/filters/rpc.exception';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(SpinnerMicroserviceModule);
@@ -19,7 +19,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(new CustomRpcExceptionFilter());
+  app.useGlobalFilters(new RpcToHttpExceptionFilter());
 
   app
     .startAllMicroservices()

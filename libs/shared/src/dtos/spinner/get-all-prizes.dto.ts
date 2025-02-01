@@ -21,10 +21,11 @@ export class GetAllPrizesByUserDto extends PaginationDto {
   @Type(() => String)
   sort: 'ASC' | 'DESC';
 
-  @ApiPropertyOptional({ default: 'createdAt' })
+  @ApiPropertyOptional({ default: 'wonAt' })
   @IsString()
   @IsOptional()
   @Transform(({ value }) => value.trim())
   @Type(() => String)
+  @IsIn(['wonAt', 'prizeId'])
   sortBy: string;
 }

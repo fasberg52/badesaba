@@ -3,6 +3,7 @@ import { ReferralServiceModule } from './referral-service.module';
 import { RmqService } from '@app/shared/rmq/rmq.service';
 import { RmqOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(ReferralServiceModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useGlobalFilters(new RpcToHttpExceptionFilter());
 
   app
     .startAllMicroservices()

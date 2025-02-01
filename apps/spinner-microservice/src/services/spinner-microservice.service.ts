@@ -19,6 +19,7 @@ import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
 import { GetAllPrizesByUserDto } from '@app/shared/dtos/spinner/get-all-prizes.dto';
 import { applySortingToFindOptions } from '@app/shared/factory/sort.factory';
 import { PrizeEntity } from '@app/shared/entities/prize.entity';
+import { NotFoundRpcException, BadRequestRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class SpinnerMicroserviceService {
@@ -35,7 +36,7 @@ export class SpinnerMicroserviceService {
         this.userClient.send({ cmd: KEYS_RQM.GET_USER_BY_ID }, userId),
       );
       if (!user) {
-        throw new RpcException('کاربر پیدا نشد!');
+        throw new NotFoundRpcException('کاربر پیدا نشد!');
       }
 
       const userWithPrizes = await this.userPrizeRepository.find({
@@ -68,10 +69,6 @@ export class SpinnerMicroserviceService {
 
       console.log(`availablePrizes >>\\n ${JSON.stringify(availablePrizes)}`);
 
-      if (availablePrizes.length === 0) {
-        throw new RpcException('هیچ جایزه‌ای برای کاربر باقی نمانده است!');
-      }
-
       const scoreUser = await firstValueFrom(
         this.scoreClient.send(
           { cmd: KEYS_RQM.LOWER_POINTS_FROM_USER },
@@ -80,7 +77,7 @@ export class SpinnerMicroserviceService {
       );
 
       if (scoreUser.score <= 1) {
-        throw new RpcException('امتیاز کافی برای اجرای گردونه وجود ندارد');
+        throw new BadRequestRpcException('امتیاز کافی برای اجرای گردونه وجود ندارد');
       }
 
       const totalWeight = availablePrizes.reduce((sum, p) => sum + p.weight, 0);
@@ -114,7 +111,7 @@ export class SpinnerMicroserviceService {
 
       return selectedPrize;
     } catch (error) {
-      throw new RpcException(error.message || 'Unknown error');
+      throw error;
     }
   }
 
@@ -138,7 +135,6 @@ export class SpinnerMicroserviceService {
           id: true,
           name: true,
           type: true,
-          weight: true,
         },
       },
       skip: (page - 1) * limit,
@@ -146,8 +142,16 @@ export class SpinnerMicroserviceService {
     };
     options = applySortingToFindOptions(options, sort, sortBy, 'id', 'DESC');
 
-    const [userPrizes, count] =
-      await this.userPrizeRepository.findAndCount(options);
-    return [userPrizes, count];
+    try {
+      const [userPrizes, count] =
+        await this.userPrizeRepository.findAndCount(options);
+      return [userPrizes, count];
+    } catch (error) {
+      console.error('error in getUserPrizes:', error);
+      throw {
+        message: error.message,
+        statusCode: 500,
+      };
+    }
   }
 }

@@ -25,9 +25,18 @@ export class ScoreMicroserviceController {
     @Payload() data: ScoreUserDto,
     @Ctx() context: RmqContext,
   ) {
-    await this.scoreMicroserviceService.addPointToUser(data);
-    this.logger.log(`process complete for ADD_POINTS_TO_USER`);
-    this.rmqService.ack(context);
+    try {
+      const result = await this.scoreMicroserviceService.addPointToUser(data);
+      this.logger.log(`process complete for ADD_POINTS_TO_USER`);
+      this.rmqService.ack(context);
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `error process ADD_POINTS_TO_USER for user ${data.userId}: ${error}`,
+      );
+      this.rmqService.nAck(context);
+      throw error;
+    }
   }
 
   @EventPattern({ cmd: KEYS_RQM.LOWER_POINTS_FROM_USER })
@@ -35,12 +44,21 @@ export class ScoreMicroserviceController {
     @Payload() data: ScoreUserDto,
     @Ctx() context: RmqContext,
   ) {
-    await this.scoreMicroserviceService.lowerPointFromUser(
-      data.userId,
-      data.score,
-    );
-    this.logger.log(`process complete for LOWER_POINTS_FROM_USER`);
-    this.rmqService.ack(context);
+    try {
+      const result = await this.scoreMicroserviceService.lowerPointFromUser(
+        data.userId,
+        data.score,
+      );
+      this.logger.log(`process complete for LOWER_POINTS_FROM_USER`);
+      this.rmqService.ack(context);
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `error process LOWER_POINTS_FROM_USER for user ${data.userId}: ${error}`,
+      );
+      this.rmqService.nAck(context);
+      throw error;
+    }
   }
 
   @MessagePattern({ cmd: KEYS_RQM.GET_SCORE_BY_USER_ID })

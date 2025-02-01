@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthContoller } from './controllers/auth.controller';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RoleGuard } from '@app/auth/guards/role.guard';
 import { JwtGuard } from '@app/auth/guards/jwt.gaurd';
 import { AuthModule } from '@app/auth';
@@ -15,6 +15,7 @@ import {
 import { ReferralController } from './controllers/referral.controller';
 import { SpinnerController } from './controllers/spinner.controller';
 import { ScoreController } from './controllers/score.controller';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ScoreController } from './controllers/score.controller';
       provide: APP_GUARD,
       useClass: RoleGuard,
     },
+    { provide: APP_FILTER, useClass: RpcToHttpExceptionFilter },
   ],
 })
 export class ApiGatewayModule {}
