@@ -16,9 +16,16 @@ import { ReferralController } from './controllers/referral.controller';
 import { SpinnerController } from './controllers/spinner.controller';
 import { ScoreController } from './controllers/score.controller';
 import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 150,
+      },
+    ]),
     RmqModule.register({
       name: AUTH_SERVICE,
     }),
