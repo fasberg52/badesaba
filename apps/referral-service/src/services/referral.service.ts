@@ -5,17 +5,21 @@ import {
   SCORE_SERVICE,
   USER_SERVICE,
 } from '@app/shared/constants/name-microservice';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { first, firstValueFrom } from 'rxjs';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { DataSource } from 'typeorm';
+import {
+  BadRequestRpcException,
+  NotFoundRpcException,
+} from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class ReferralService {
   constructor(
     private readonly referralRepository: ReferralRepository,
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -37,7 +41,7 @@ export class ReferralService {
       console.log('Referrer:', referrer);
 
       if (!referrer) {
-        throw new RpcException('کد معرف اشتباه است');
+        throw new BadRequestRpcException('کد معرف اشتباه است');
       }
 
       const referredUser = await firstValueFrom(
@@ -45,7 +49,7 @@ export class ReferralService {
       );
 
       if (!referredUser) {
-        throw new RpcException('کاربر معرفی شده یافت نشد');
+        throw new NotFoundRpcException('کاربر معرفی شده یافت نشد');
       }
 
       const existingReferral = await this.referralRepository.findOne({
@@ -53,7 +57,7 @@ export class ReferralService {
       });
 
       if (existingReferral) {
-        throw new RpcException('این کاربر قبلا معرفی شده است');
+        throw new BadRequestRpcException('این کاربر قبلا معرفی شده است');
       }
 
       const referral = this.referralRepository.create({
@@ -86,10 +90,9 @@ export class ReferralService {
         referred: referredUser.id,
       };
     } catch (error) {
-      console.error('Error in useReferral:', error);
       await queryRunner.rollbackTransaction();
 
-      throw new RpcException(error.message);
+      throw error;
     } finally {
       await queryRunner.release();
     }

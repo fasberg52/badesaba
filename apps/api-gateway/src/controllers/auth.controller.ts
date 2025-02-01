@@ -13,13 +13,14 @@ import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom, retry } from 'rxjs';
 import { TokenResponse } from '../responses/auth/token.response';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientRMQ } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '@app/shared/constants/name-microservice';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 @Controller('auth')
 @ApiTags('Auth Microservice')
 export class AuthContoller {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
+  constructor(@Inject(AUTH_SERVICE) private authClient: ClientRMQ) {}
   @ApiOkResponse(TokenResponse.getApiDoc())
   @Public()
   @Post('login')
@@ -27,17 +28,12 @@ export class AuthContoller {
     console.log(`data ${JSON.stringify(data)}`);
     try {
       const result = await firstValueFrom(
-        this.authClient
-          .send({ cmd: KEYS_RQM.USER_LOGIN }, data)
-          .pipe(retry({ count: 3, delay: 1000 })),
+        this.authClient.send({ cmd: KEYS_RQM.USER_LOGIN }, data),
       );
       return new TokenResponse(result.token);
     } catch (error) {
-      const { message, statusCode } = error;
-      throw new HttpException(
-        message,
-        statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.log('erorr heereeeeeeee');
+      throw error;
     }
   }
 

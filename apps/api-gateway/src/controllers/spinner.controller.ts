@@ -5,21 +5,27 @@ import { UserEntity } from '@app/shared/entities/user.entity';
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Inject,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientRMQ } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { firstValueFrom } from 'rxjs';
-import { SpinnerResponse } from '../responses/spinner/spinner.response';
+import { first, firstValueFrom } from 'rxjs';
+import {
+  SpinnerResponse,
+  UserPrizeListResponse,
+} from '../responses/spinner/spinner.response';
+import { GetAllPrizesByUserDto } from '@app/shared/dtos/spinner/get-all-prizes.dto';
 
 @Controller('spinner')
 @ApiTags('Spinner - Microservice')
 @ApiBearerAuth()
 export class SpinnerController {
-  constructor(@Inject(SPINNER_SERVICE) private spinnerClient: ClientProxy) {}
+  constructor(@Inject(SPINNER_SERVICE) private spinnerClient: ClientRMQ) {}
 
   @ApiOkResponse(SpinnerResponse.getApiDoc())
   @Post('run')
@@ -30,6 +36,28 @@ export class SpinnerController {
         this.spinnerClient.send({ cmd: KEYS_RQM.RUN_SPINNER }, userId),
       );
       return new SpinnerResponse(result);
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  @Get('user-prizes')
+  async getDetailUserPrizes(
+    @User() user: UserEntity,
+    @Query() dto: GetAllPrizesByUserDto,
+  ): Promise<UserPrizeListResponse> {
+    const userId = user.id;
+    console.log(dto);
+    try {
+      const [result, total] = await firstValueFrom(
+        this.spinnerClient.send(
+          { cmd: KEYS_RQM.GET_DETAIL_PRIZES_USER },
+          { userId, ...dto },
+        ),
+      );
+      return new UserPrizeListResponse(result, total);
     } catch (error) {
       throw new HttpException(
         error.message,

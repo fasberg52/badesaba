@@ -38,7 +38,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ default: '09218913541' })
   @IsString()
   @MaxLength(11)
   @Matches(/^[0-9]{11}$/)
@@ -46,6 +46,7 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 11, unique: true, nullable: false })
   phone: string;
 
+  @ApiProperty({ default: 'Aa123456*' })
   @Expose()
   @IsString()
   @IsStrongPassword()

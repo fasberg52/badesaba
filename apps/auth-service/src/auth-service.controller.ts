@@ -16,7 +16,7 @@ export class AuthController {
     try {
       return await this.authService.login(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error
     }
   }
 

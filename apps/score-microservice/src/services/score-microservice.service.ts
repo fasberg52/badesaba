@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { ScoreRepository } from '../repositories/score-microservice.repository';
 import { RpcException } from '@nestjs/microservices';
 import { ScoreUserDto } from '@app/shared/dtos/score/score.dto';
+import { ScoreEntity } from '@app/shared/entities/score.entity';
+import { plainToInstance } from 'class-transformer';
+import {
+  BadRequestRpcException,
+  NotFoundRpcException,
+} from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class ScoreMicroserviceService {
@@ -12,7 +18,7 @@ export class ScoreMicroserviceService {
       const { userId, score } = scoreDto;
       const numericScore = Number(score);
       if (isNaN(numericScore)) {
-        throw new RpcException('امتیاز باید عدد معتبر باشد');
+        throw new BadRequestRpcException('امتیاز باید عدد معتبر باشد');
       }
       let userScore = await this.scoreRepository.findOne({ where: { userId } });
 
@@ -23,14 +29,12 @@ export class ScoreMicroserviceService {
         });
       } else {
         userScore.score = Number(userScore.score) + numericScore;
-
-       
       }
 
       await this.scoreRepository.save(userScore);
       return userScore;
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error;
     }
   }
 
@@ -39,7 +43,7 @@ export class ScoreMicroserviceService {
       let userScore = await this.scoreRepository.findOne({ where: { userId } });
 
       if (!userScore) {
-        throw new RpcException('کاربر یافت نشد');
+        throw new NotFoundRpcException('کاربر یافت نشد');
       }
 
       userScore.score -= score;
@@ -47,7 +51,19 @@ export class ScoreMicroserviceService {
       console.log('User score:', userScore);
       return userScore;
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error;
     }
+  }
+
+  async getScoreByUserId(userId: number): Promise<ScoreEntity[]> {
+    const scoreUser = await this.scoreRepository.find({
+      where: { userId: userId },
+      select: {
+        score: true,
+        userId: true,
+      },
+    });
+
+    return plainToInstance(ScoreEntity, scoreUser);
   }
 }

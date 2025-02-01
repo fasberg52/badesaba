@@ -8,20 +8,24 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { PrizeRepository } from '../repositories/prize.repository';
 import { first, firstValueFrom } from 'rxjs';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { PrizeTypeEnum } from '@app/shared/enums/prize.enum';
-import { In, Not } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, In, Not } from 'typeorm';
 import { UserPrizeRepository } from '../repositories/user-prize.repository';
 import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
+import { GetAllPrizesByUserDto } from '@app/shared/dtos/spinner/get-all-prizes.dto';
+import { applySortingToFindOptions } from '@app/shared/factory/sort.factory';
+import { PrizeEntity } from '@app/shared/entities/prize.entity';
+import { NotFoundRpcException, BadRequestRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class SpinnerMicroserviceService {
   constructor(
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
     private readonly prizeRepository: PrizeRepository,
     private readonly userPrizeRepository: UserPrizeRepository,
   ) {}
@@ -32,7 +36,7 @@ export class SpinnerMicroserviceService {
         this.userClient.send({ cmd: KEYS_RQM.GET_USER_BY_ID }, userId),
       );
       if (!user) {
-        throw new RpcException('کاربر پیدا نشد!');
+        throw new NotFoundRpcException('کاربر پیدا نشد!');
       }
 
       const userWithPrizes = await this.userPrizeRepository.find({
@@ -65,10 +69,6 @@ export class SpinnerMicroserviceService {
 
       console.log(`availablePrizes >>\\n ${JSON.stringify(availablePrizes)}`);
 
-      if (availablePrizes.length === 0) {
-        throw new RpcException('هیچ جایزه‌ای برای کاربر باقی نمانده است!');
-      }
-
       const scoreUser = await firstValueFrom(
         this.scoreClient.send(
           { cmd: KEYS_RQM.LOWER_POINTS_FROM_USER },
@@ -77,7 +77,7 @@ export class SpinnerMicroserviceService {
       );
 
       if (scoreUser.score <= 1) {
-        throw new RpcException('امتیاز کافی برای اجرای گردونه وجود ندارد');
+        throw new BadRequestRpcException('امتیاز کافی برای اجرای گردونه وجود ندارد');
       }
 
       const totalWeight = availablePrizes.reduce((sum, p) => sum + p.weight, 0);
@@ -90,12 +90,9 @@ export class SpinnerMicroserviceService {
 
       for (const prize of availablePrizes) {
         cumulativeWeight += prize.weight;
-        console.log(
-          `Checking prize: ${prize.name} | Weight: ${prize.weight} | Cumulative: ${cumulativeWeight}\n`,
-        );
+
         if (random < cumulativeWeight) {
           selectedPrize = prize;
-          console.log(`Selected Prize: ${JSON.stringify(selectedPrize)}\n`);
 
           break;
         }
@@ -114,8 +111,47 @@ export class SpinnerMicroserviceService {
 
       return selectedPrize;
     } catch (error) {
-      console.error('Error in runSpinner:', error);
-      throw new RpcException(error.message || 'Unknown error occurred');
+      throw error;
+    }
+  }
+
+  async getUserPrizes(
+    dto: GetAllPrizesByUserDto & { userId: number },
+  ): Promise<[UserPrizeEntity[], number]> {
+    const { page, limit, type, sort, sortBy, userId } = dto;
+    const where: FindOptionsWhere<UserPrizeEntity> = { userId };
+    if (type) {
+      where.prize = { type };
+    }
+
+    let options: FindManyOptions<UserPrizeEntity> = {
+      where,
+      relations: { prize: true },
+      select: {
+        userId: true,
+        prizeId: true,
+        wonAt: true,
+        prize: {
+          id: true,
+          name: true,
+          type: true,
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    };
+    options = applySortingToFindOptions(options, sort, sortBy, 'id', 'DESC');
+
+    try {
+      const [userPrizes, count] =
+        await this.userPrizeRepository.findAndCount(options);
+      return [userPrizes, count];
+    } catch (error) {
+      console.error('error in getUserPrizes:', error);
+      throw {
+        message: error.message,
+        statusCode: 500,
+      };
     }
   }
 }

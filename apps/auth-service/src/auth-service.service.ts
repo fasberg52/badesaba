@@ -1,3 +1,4 @@
+import { BadRequestRpcException } from './../../../libs/shared/src/filters/custom-rpc-exception/custm-rpc-exception';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import {
   SCORE_SERVICE,
@@ -6,10 +7,16 @@ import {
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
 import { UserRoleEnum } from '@app/shared/enums/role.enum';
-import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConfilctRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
+import {
+  BadRequestException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { UserService } from 'apps/user-service/src/services/user-service.service';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom, lastValueFrom, Observable, retry } from 'rxjs';
@@ -19,8 +26,8 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
   ) {}
 
   async login(dto: LoginDto) {
@@ -29,14 +36,12 @@ export class AuthService {
     );
     console.log('User:', user);
 
-    if (!user) throw new BadRequestException('کاربری با این مشخصات یافت نشد');
+    if (!user)
+      throw new ConfilctRpcException('نام کاربری یا رمز عبور اشتباه است');
 
     const isValidPassword = await bcrypt.compare(dto.password, user.password);
     if (!isValidPassword)
-      throw new RpcException({
-        message: 'sرمز عبور اشتباه است',
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
+      throw new ConfilctRpcException('نام کاربری یا رمز عبور اشتباه است');
 
     const token = await this.generateToken(user);
     return { token };
@@ -49,7 +54,7 @@ export class AuthService {
     );
     console.log('Existing user:', existingUser);
     if (existingUser)
-      throw new BadRequestException('این کاربر از قبل وجود دارد');
+      throw new BadRequestRpcException('این کاربر از قبل وجود دارد');
     console.log('Creating user:', dto);
     const user = await this.userClient
       .send(

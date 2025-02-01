@@ -7,13 +7,14 @@ import {
 } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { RmqService } from '@app/shared/rmq/rmq.service';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(UserServiceModule);
   const rmqService = app.get<RmqService>(RmqService);
 
   app.connectMicroservice<RmqOptions>(rmqService.getOptions('USER', true));
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -21,6 +22,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useGlobalFilters(new RpcToHttpExceptionFilter());
 
   app
     .startAllMicroservices()

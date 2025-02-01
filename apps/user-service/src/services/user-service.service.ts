@@ -2,6 +2,7 @@ import { UserEntity } from '@app/shared/entities/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import * as bcrypt from 'bcrypt';
+import { BadRequestRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -13,7 +14,7 @@ export class UserService {
         .toUpperCase();
     }
     if (!dto.password) {
-      throw new BadRequestException('رمز عبور اجباری است');
+      throw new BadRequestRpcException('رمز عبور اجباری است');
     }
 
     dto.password = await bcrypt.hash(dto.password, 10);

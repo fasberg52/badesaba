@@ -11,6 +11,8 @@ import {
 } from '@app/shared/constants/name-microservice';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { APP_FILTER } from '@nestjs/core';
+import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
 @Module({
   imports: [
@@ -36,6 +38,13 @@ import { PassportModule } from '@nestjs/passport';
     AuthModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService],
+  providers: [
+    AuthService,
+    ConfigService,
+    {
+      provide: APP_FILTER,
+      useClass: RpcToHttpExceptionFilter,
+    },
+  ],
 })
 export class AuthServiceModule {}
