@@ -6,10 +6,15 @@ import {
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
 import { UserRoleEnum } from '@app/shared/enums/role.enum';
-import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { UserService } from 'apps/user-service/src/services/user-service.service';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom, lastValueFrom, Observable, retry } from 'rxjs';
@@ -19,8 +24,8 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
   ) {}
 
   async login(dto: LoginDto) {

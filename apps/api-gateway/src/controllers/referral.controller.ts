@@ -12,7 +12,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientRMQ } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 
@@ -20,7 +20,7 @@ import { firstValueFrom } from 'rxjs';
 @ApiTags('Referral Microservice')
 @ApiBearerAuth()
 export class ReferralController {
-  constructor(@Inject(REFERRAL_SERVICE) private referralClient: ClientProxy) {}
+  constructor(@Inject(REFERRAL_SERVICE) private referralClient: ClientRMQ) {}
 
   @Post('use')
   async useReferral(

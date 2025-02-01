@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ScoreRepository } from '../repositories/score-microservice.repository';
 import { RpcException } from '@nestjs/microservices';
 import { ScoreUserDto } from '@app/shared/dtos/score/score.dto';
+import { ScoreEntity } from '@app/shared/entities/score.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class ScoreMicroserviceService {
@@ -23,14 +25,15 @@ export class ScoreMicroserviceService {
         });
       } else {
         userScore.score = Number(userScore.score) + numericScore;
-
-       
       }
 
       await this.scoreRepository.save(userScore);
       return userScore;
     } catch (error) {
-      throw new RpcException(error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'unknown error';
+
+      throw new RpcException(errorMessage);
     }
   }
 
@@ -47,7 +50,22 @@ export class ScoreMicroserviceService {
       console.log('User score:', userScore);
       return userScore;
     } catch (error) {
-      throw new RpcException(error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'unknown error';
+
+      throw new RpcException(errorMessage);
     }
+  }
+
+  async getScoreByUserId(userId: number): Promise<ScoreEntity[]> {
+    const scoreUser = await this.scoreRepository.find({
+      where: { userId: userId },
+      select: {
+        score: true,
+        userId: true,
+      },
+    });
+
+    return plainToInstance(ScoreEntity, scoreUser);
   }
 }

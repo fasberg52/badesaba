@@ -9,10 +9,12 @@ import { RmqModule } from '@app/shared/rmq/rmq.module';
 import {
   AUTH_SERVICE,
   REFERRAL_SERVICE,
+  SCORE_SERVICE,
   SPINNER_SERVICE,
 } from '@app/shared/constants/name-microservice';
 import { ReferralController } from './controllers/referral.controller';
 import { SpinnerController } from './controllers/spinner.controller';
+import { ScoreController } from './controllers/score.controller';
 
 @Module({
   imports: [
@@ -25,10 +27,18 @@ import { SpinnerController } from './controllers/spinner.controller';
     RmqModule.register({
       name: SPINNER_SERVICE,
     }),
+    RmqModule.register({
+      name: SCORE_SERVICE,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
   ],
-  controllers: [AuthContoller, ReferralController, SpinnerController],
+  controllers: [
+    AuthContoller,
+    ReferralController,
+    SpinnerController,
+    ScoreController,
+  ],
   providers: [
     {
       provide: APP_GUARD,

@@ -7,4 +7,5 @@ export const KEYS_RQM = {
   ADD_POINTS_TO_USER: 'add.points.to.user',
   LOWER_POINTS_FROM_USER: 'lower.points.from.user',
   RUN_SPINNER: 'run.spinner',
+  GET_SCORE_BY_USER_ID: 'get.score.by.user.id',
 };

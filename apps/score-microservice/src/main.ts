@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(ScoreMicroserviceModule);
   const rmqService = app.get<RmqService>(RmqService);
 
-  app.connectMicroservice<RmqOptions>(rmqService.getOptions('SCORE', true));
+  app.connectMicroservice<RmqOptions>(rmqService.getOptions('SCORE', false));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,6 +27,6 @@ async function bootstrap() {
       console.error('Error starting microservices', err);
     });
   await app.listen(process.env.SCORE_SERVICE_PORT ?? 3004);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application Score - Microservice is running on: ${await app.getUrl()}`);
 }
 bootstrap();

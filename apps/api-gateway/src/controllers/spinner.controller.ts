@@ -10,7 +10,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientRMQ } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 import { SpinnerResponse } from '../responses/spinner/spinner.response';
@@ -19,7 +19,7 @@ import { SpinnerResponse } from '../responses/spinner/spinner.response';
 @ApiTags('Spinner - Microservice')
 @ApiBearerAuth()
 export class SpinnerController {
-  constructor(@Inject(SPINNER_SERVICE) private spinnerClient: ClientProxy) {}
+  constructor(@Inject(SPINNER_SERVICE) private spinnerClient: ClientRMQ) {}
 
   @ApiOkResponse(SpinnerResponse.getApiDoc())
   @Post('run')

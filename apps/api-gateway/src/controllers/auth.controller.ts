@@ -13,13 +13,13 @@ import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { firstValueFrom, retry } from 'rxjs';
 import { TokenResponse } from '../responses/auth/token.response';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientRMQ } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '@app/shared/constants/name-microservice';
 
 @Controller('auth')
 @ApiTags('Auth Microservice')
 export class AuthContoller {
-  constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
+  constructor(@Inject(AUTH_SERVICE) private authClient: ClientRMQ) {}
   @ApiOkResponse(TokenResponse.getApiDoc())
   @Public()
   @Post('login')

@@ -5,7 +5,7 @@ import {
   SCORE_SERVICE,
   USER_SERVICE,
 } from '@app/shared/constants/name-microservice';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { first, firstValueFrom } from 'rxjs';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { DataSource } from 'typeorm';
@@ -14,8 +14,8 @@ import { DataSource } from 'typeorm';
 export class ReferralService {
   constructor(
     private readonly referralRepository: ReferralRepository,
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
     private readonly dataSource: DataSource,
   ) {}
 

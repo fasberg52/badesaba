@@ -8,7 +8,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { PrizeRepository } from '../repositories/prize.repository';
 import { first, firstValueFrom } from 'rxjs';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
@@ -20,8 +20,8 @@ import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
 @Injectable()
 export class SpinnerMicroserviceService {
   constructor(
-    @Inject(USER_SERVICE) private userClient: ClientProxy,
-    @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+    @Inject(USER_SERVICE) private userClient: ClientRMQ,
+    @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
     private readonly prizeRepository: PrizeRepository,
     private readonly userPrizeRepository: UserPrizeRepository,
   ) {}
