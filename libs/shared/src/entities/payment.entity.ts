@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PaymentStatusEnum } from '../enums/payment.enum';
-import { IsDateString, IsEnum, IsNumber } from 'class-validator';
+import { IsDateString, IsEnum, IsNumber, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 
@@ -34,6 +34,7 @@ export class PaymentEntity {
 
   @ApiProperty()
   @IsNumber()
+  @IsPositive()
   @Column({ type: 'int', nullable: false })
   amount: number;
 

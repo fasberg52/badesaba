@@ -9,4 +9,6 @@ export const KEYS_RQM = {
   RUN_SPINNER: 'run.spinner',
   GET_SCORE_BY_USER_ID: 'get.score.by.user.id',
   GET_DETAIL_PRIZES_USER: 'get.detail.prizes.user',
+  PAYMENT_GENERATE: 'payment.generate',
+  PAYMENT_VERIFY: 'payment.verify',
 };

@@ -22,3 +22,8 @@ export class ConfilctRpcException extends BaseRpcException {
     super(message, 409);
   }
 }
+  export class NotAcceptableRpcException extends BaseRpcException {
+    constructor(message = 'NotAcceptable request') {
+      super(message, 409);
+    }
+}
