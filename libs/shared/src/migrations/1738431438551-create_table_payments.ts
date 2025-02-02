@@ -11,8 +11,8 @@ export class CreateTablePayments1738431438551 implements MigrationInterface {
     await queryRunner.createSchema('payment', true);
     await queryRunner.createTable(
       new Table({
-        name: 'payments',
         schema: 'payment',
+        name: 'payments',
         columns: [
           {
             name: 'id',
