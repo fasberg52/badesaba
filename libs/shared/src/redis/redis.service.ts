@@ -5,11 +5,8 @@ import { Redis } from 'ioredis';
 @Injectable()
 export class RedisService {
   private readonly prefix: string;
-
-  constructor(
-    @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
-    private readonly configService: ConfigService,
-  ) {
+  private redisClient: Redis;
+  constructor(private readonly configService: ConfigService) {
     this.prefix = this.configService.get<string>('REDIS_PREFIX');
     this.redisClient = new Redis({
       host: this.configService.get<string>('REDIS_HOST'),
