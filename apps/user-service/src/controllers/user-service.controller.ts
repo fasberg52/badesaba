@@ -46,7 +46,7 @@ export class UserServiceController {
       return user;
     } catch (error) {
       console.error('Error in getUserByPhone:', error.message);
-      throw new RpcException(error.message);
+      throw error
     }
   }
 
@@ -55,7 +55,7 @@ export class UserServiceController {
     try {
       return await this.userService.getUserByReferralCode(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error
     }
   }
 }
