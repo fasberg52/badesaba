@@ -46,12 +46,12 @@ export class CreateTablePayments1738431438551 implements MigrationInterface {
           },
 
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
           },
           {
-            name: 'updated_at',
+            name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP',
@@ -74,5 +74,6 @@ export class CreateTablePayments1738431438551 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('payment.payments', true, true, true);
+    await queryRunner.dropSchema('payment', true, true);
   }
 }

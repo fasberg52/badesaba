@@ -155,8 +155,36 @@ services:
       - postgres
       - rabbitmq
     networks:
-      - badesaba-network 
+      - badesaba-network
     command: npm run start:dev spinner-microservice
+
+  payment-microservice:
+    image: payment-microservice
+    build:
+      context: .
+      dockerfile: ./apps/payment-microservice/Dockerfile
+    ports:
+      - '5006:3006'
+    environment:
+      - RMQ_URL=amqp://rabbitmq-badesaba:5672
+      - RMQ_PAYMENT_QUEUE=payment-service
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=2434127reza
+      - DATABASE_NAME=badesaba
+      - JWT_SECRET=asdquwhdasjhdkoasdjjj
+      - PAMENT_SERVICE_PORT=3006
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    networks:
+      - badesaba-network
+    command: npm run start:dev payment-microservice
 
   postgres:
     image: postgres:latest
@@ -188,6 +216,17 @@ services:
     networks:
       - badesaba-network
 
+  redis:
+    image: redis:alpine
+    container_name: redis-badesaba
+    restart: always
+    ports:
+      - '6378:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - badesaba-network
+
 networks:
   badesaba-network:
     driver: bridge
@@ -195,3 +234,4 @@ networks:
 volumes:
   postgres_data:
   rabbitmq_data:
+  redis_data:

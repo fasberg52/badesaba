@@ -14,6 +14,7 @@ import {
   NotFoundRpcException,
 } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 import { ProcessPaymentDto } from '@app/shared/dtos/payment/process-payment.dto';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class PaymentMicroserviceService {
@@ -24,15 +25,12 @@ export class PaymentMicroserviceService {
     private readonly redisService: RedisService,
   ) {}
 
-  async createPayment(createPaymentDto: CreatePaymentDto) {
-    const queryRunner = this.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
+  async createPayment(createPaymentDto: CreatePaymentDto & { userId: number }) {
     try {
       const { userId, amount } = createPaymentDto;
 
       const transactionId = uuidv4();
+      const redisKey = `transaction:${transactionId}`;
 
       const payment = this.paymentRepository.create({
         amount,
@@ -40,62 +38,47 @@ export class PaymentMicroserviceService {
         transactionId,
         status: PaymentStatusEnum.PENDING,
       });
-      await queryRunner.manager.save(payment);
+      await this.paymentRepository.save(payment);
 
-      await this.redisService.setTransactionStatus(
-        transactionId,
-        PaymentStatusEnum.PENDING,
-      );
+      await this.redisService.set(redisKey, payment, 600);
 
       const paymentLink = this.generatePaymentLink(transactionId);
 
-      await queryRunner.commitTransaction();
-
       return {
-        message: 'پرداخت با موفقیت انجام شد',
-        transactionId,
         paymentLink,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new NotAcceptableRpcException(`پرداخت انجام نشد: ${error.message}`);
-    } finally {
-      await queryRunner.release();
+      throw new NotAcceptableRpcException(`پرداخت انجام نشد: ${error}`);
     }
   }
 
   async processPayment(data: ProcessPaymentDto) {
     const { transactionId, status } = data;
-    const queryRunner = this.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    const cachedPayment = await this.redisService.getTransactionStatus(
-      `payment:${transactionId}`,
-    );
+    const redisKey = `transaction:${transactionId}`;
+    const cachedPayment = await this.redisService.get<PaymentEntity>(redisKey);
     if (!cachedPayment) {
-      throw new NotFoundRpcException('تراکنش یافت نشد!');
+      throw new NotFoundRpcException('تراکنش منقضی یا پردازش شده است');
     }
 
-    const payment = JSON.parse(cachedPayment);
+    const payment = cachedPayment;
+    const userId = payment.userId;
+
     payment.status = status;
 
     try {
       payment.updatedAt = new Date();
-      await queryRunner.manager.save(payment);
+      await this.paymentRepository.save(payment);
 
       if (status === PaymentStatusEnum.SUCCESS) {
         const pointsEarned = this.calculatePoints(payment.amount);
-
-        await this.scoreClient
-          .send(
+        await firstValueFrom(
+          this.scoreClient.emit(
             { cmd: KEYS_RQM.ADD_POINTS_TO_USER },
-            { userId: payment.userId, points: pointsEarned },
-          )
-          .toPromise();
+            { userId: userId, score: Number(pointsEarned) },
+          ),
+        );
       }
-
-      await queryRunner.commitTransaction();
+      await this.redisService.del(redisKey);
 
       return {
         message: 'پرداخت با موفقیت آپدیت شد',
@@ -103,10 +86,7 @@ export class PaymentMicroserviceService {
         status: payment.status,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new NotAcceptableRpcException(`پرداخت انجام نشد: ${error.message}`);
-    } finally {
-      await queryRunner.release();
+      throw new NotAcceptableRpcException(`پرداخت انجام نشد: ${error}`);
     }
   }
 

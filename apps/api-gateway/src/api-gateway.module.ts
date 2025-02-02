@@ -8,6 +8,7 @@ import { AuthModule } from '@app/auth';
 import { RmqModule } from '@app/shared/rmq/rmq.module';
 import {
   AUTH_SERVICE,
+  PAYMENT_SERVICE,
   REFERRAL_SERVICE,
   SCORE_SERVICE,
   SPINNER_SERVICE,
@@ -17,6 +18,7 @@ import { SpinnerController } from './controllers/spinner.controller';
 import { ScoreController } from './controllers/score.controller';
 import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { PaymentController } from './controllers/payment.controller';
 
 @Module({
   imports: [
@@ -38,10 +40,14 @@ import { ThrottlerModule } from '@nestjs/throttler';
     RmqModule.register({
       name: SCORE_SERVICE,
     }),
+    RmqModule.register({
+      name: PAYMENT_SERVICE,
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
   ],
   controllers: [
+    PaymentController,
     AuthContoller,
     ReferralController,
     SpinnerController,

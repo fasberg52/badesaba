@@ -27,7 +27,7 @@ async function bootstrap() {
       .catch((err) => {
         console.error('Error starting microservices', err);
       });
-    await app.listen(process.env.REFERRAL_SERVICE_PORT ?? 3006);
+    await app.listen(process.env.PAYMENT_SERVICE_PORT ?? 3006);
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

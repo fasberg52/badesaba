@@ -23,7 +23,7 @@ export class UserServiceController {
       console.log('>>>>>> Creating user:', data);
       return await this.userService.createUser(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error;
     }
   }
 
@@ -32,7 +32,7 @@ export class UserServiceController {
     try {
       return await this.userService.getUserById(data);
     } catch (error) {
-      throw new RpcException(error.message);
+      throw error;
     }
   }
 
@@ -45,8 +45,8 @@ export class UserServiceController {
       console.log('Sending response for getUserByPhone:', user);
       return user;
     } catch (error) {
-      console.error('Error in getUserByPhone:', error.message);
-      throw error
+      console.error('Error in getUserByPhone:', error);
+      throw error;
     }
   }
 
@@ -55,7 +55,7 @@ export class UserServiceController {
     try {
       return await this.userService.getUserByReferralCode(data);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }
