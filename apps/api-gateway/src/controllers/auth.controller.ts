@@ -61,9 +61,18 @@ export class AuthContoller {
   async signup(@Body() data: SignupDto): Promise<TokenResponse> {
     try {
       const result = await firstValueFrom(
-        this.authClient
-          .send({ cmd: KEYS_RQM.USER_SIGNUP }, data)
-          .pipe(retry({ count: 3, delay: 1000 })),
+        this.authClient.send({ cmd: KEYS_RQM.USER_SIGNUP }, data).pipe(
+          retry({ count: 3, delay: 1000 }),
+          catchError((err) => {
+            if (err instanceof TimeoutError) {
+              console.log(err);
+              return throwError(
+                () => new RpcException('internal server error'),
+              );
+            }
+            return throwError(() => err);
+          }),
+        ),
       );
       return new TokenResponse(result.token);
     } catch (error) {

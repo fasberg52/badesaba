@@ -91,7 +91,7 @@ export class PaymentMicroserviceService {
   }
 
   private generatePaymentLink(transactionId: string): string {
-    return `http://localhost/pay?transactionId=${transactionId}`;
+    return `${process.env.PAYMENT_URL}=${transactionId}`;
   }
 
   private calculatePoints(amount: number): number {

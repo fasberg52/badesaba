@@ -46,7 +46,6 @@ export class PaymentMicroserviceController {
     @Payload() data: ProcessPaymentDto,
     @Ctx() context: RmqContext,
   ) {
-
     try {
       const result = await this.paymentMicroserviceService.processPayment(data);
       this.rmqService.ack(context);
