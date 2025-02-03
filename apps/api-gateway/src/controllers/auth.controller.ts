@@ -10,10 +10,17 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { firstValueFrom, retry } from 'rxjs';
+import {
+  catchError,
+  firstValueFrom,
+  retry,
+  throwError,
+  timeout,
+  TimeoutError,
+} from 'rxjs';
 import { TokenResponse } from '../responses/auth/token.response';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
-import { ClientRMQ } from '@nestjs/microservices';
+import { ClientRMQ, RpcException } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '@app/shared/constants/name-microservice';
 import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 
@@ -28,7 +35,18 @@ export class AuthContoller {
     console.log(`data ${JSON.stringify(data)}`);
     try {
       const result = await firstValueFrom(
-        this.authClient.send({ cmd: KEYS_RQM.USER_LOGIN }, data),
+        this.authClient.send({ cmd: KEYS_RQM.USER_LOGIN }, data).pipe(
+          timeout(5000),
+          retry(2),
+          catchError((err) => {
+            if (err instanceof TimeoutError) {
+              return throwError(
+                () => new RpcException('internal server error'),
+              );
+            }
+            return throwError(() => err);
+          }),
+        ),
       );
       return new TokenResponse(result.token);
     } catch (error) {
@@ -49,11 +67,7 @@ export class AuthContoller {
       );
       return new TokenResponse(result.token);
     } catch (error) {
-      const { message, statusCode } = error;
-      throw new HttpException(
-        message,
-        statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
 }

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
@@ -13,6 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 
 @Entity({ schema: 'payment', name: 'payments' })
+@Index('IDX_TRANSACTION_ID', ['transactionId'])
 export class PaymentEntity {
   @ApiProperty()
   @PrimaryGeneratedColumn('increment')

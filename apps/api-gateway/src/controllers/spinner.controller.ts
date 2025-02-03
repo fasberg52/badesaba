@@ -37,10 +37,7 @@ export class SpinnerController {
       );
       return new SpinnerResponse(result);
     } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
   @Get('user-prizes')
@@ -59,10 +56,7 @@ export class SpinnerController {
       );
       return new UserPrizeListResponse(result, total);
     } catch (error) {
-      throw new HttpException(
-        error.message,
-        error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
 }

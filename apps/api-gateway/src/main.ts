@@ -2,8 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ApiGatewayModule } from './api-gateway.module';
 import { SwaggerHelper } from '@app/shared/swagger/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from '@app/shared/filters/exception.filter';
-import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
+import { TimeoutInterceptor } from '@app/shared/interseptor/timeout.interseptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -17,6 +16,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useGlobalInterceptors(new TimeoutInterceptor());
 
   new SwaggerHelper().setup(app);
   await app.listen(process.env.port ?? 3000);

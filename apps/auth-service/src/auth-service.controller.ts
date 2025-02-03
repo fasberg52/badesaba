@@ -26,8 +26,8 @@ export class AuthController {
     try {
       return await this.authService.signup(data);
     } catch (error) {
-      console.error('Error during signup:', error.message);
-      throw new RpcException(error.message);
+      console.error('Error during signup:', error);
+      throw error
     }
   }
 }

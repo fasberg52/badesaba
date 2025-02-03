@@ -19,6 +19,8 @@ import { ScoreController } from './controllers/score.controller';
 import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PaymentController } from './controllers/payment.controller';
+import { TerminusModule } from '@nestjs/terminus';
+import { HealthController } from './controllers/health.controller';
 
 @Module({
   imports: [
@@ -44,9 +46,14 @@ import { PaymentController } from './controllers/payment.controller';
       name: PAYMENT_SERVICE,
     }),
     ConfigModule.forRoot({ isGlobal: true }),
+    TerminusModule.forRoot({
+      errorLogStyle: 'pretty',
+      gracefulShutdownTimeoutMs: 1000,
+    }),
     AuthModule,
   ],
   controllers: [
+    HealthController,
     PaymentController,
     AuthContoller,
     ReferralController,
