@@ -21,10 +21,7 @@ export class PaymentMicroserviceController {
   ) {}
 
   @MessagePattern({ cmd: KEYS_RQM.PAYMENT_GENERATE })
-  async generatePayment(
-    @Payload() data: CreatePaymentDto & { userId: number },
-    @Ctx() context: RmqContext,
-  ) {
+  async generatePayment(@Payload() data: { amount: number; userId: number }) {
     console.log(
       JSON.stringify(`PAYMENT_GENERATE DATA ${JSON.stringify(data)}`),
     );
@@ -32,27 +29,19 @@ export class PaymentMicroserviceController {
       const result = await this.paymentMicroserviceService.createPayment(data);
       this.logger.log(`process complete for GET_SCORE_BY_USER_ID`);
 
-      this.rmqService.ack(context);
-
       return result;
     } catch (error) {
-      this.rmqService.nAck(context);
       throw error;
     }
   }
 
   @MessagePattern({ cmd: KEYS_RQM.PAYMENT_VERIFY })
-  async processPayment(
-    @Payload() data: ProcessPaymentDto,
-    @Ctx() context: RmqContext,
-  ) {
+  async processPayment(@Payload() data: ProcessPaymentDto) {
     try {
       const result = await this.paymentMicroserviceService.processPayment(data);
-      this.rmqService.ack(context);
 
       return result;
     } catch (error) {
-      this.rmqService.nAck(context);
       throw error;
     }
   }

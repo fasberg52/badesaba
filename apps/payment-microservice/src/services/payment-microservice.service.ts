@@ -28,9 +28,10 @@ export class PaymentMicroserviceService {
   async createPayment(createPaymentDto: CreatePaymentDto & { userId: number }) {
     try {
       const { userId, amount } = createPaymentDto;
-
       const transactionId = uuidv4();
       const redisKey = `transaction:${transactionId}`;
+
+      console.log(redisKey);
 
       const payment = this.paymentRepository.create({
         amount,
@@ -38,9 +39,12 @@ export class PaymentMicroserviceService {
         transactionId,
         status: PaymentStatusEnum.PENDING,
       });
+
+      console.log(`payment >> ${JSON.stringify(payment)}`);
       await this.paymentRepository.save(payment);
 
-      await this.redisService.set(redisKey, payment, 600);
+      const setRedis = await this.redisService.set(redisKey, payment, 600);
+      console.log(`payment >> ${JSON.stringify(setRedis)}`);
 
       const paymentLink = this.generatePaymentLink(transactionId);
 

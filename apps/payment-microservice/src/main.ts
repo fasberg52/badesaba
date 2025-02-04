@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(PaymentMicroserviceModule);
    const rmqService = app.get<RmqService>(RmqService);
   
-    app.connectMicroservice<RmqOptions>(rmqService.getOptions('PAYMENT', false));
+    app.connectMicroservice<RmqOptions>(rmqService.getOptions('PAYMENT', true));
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
