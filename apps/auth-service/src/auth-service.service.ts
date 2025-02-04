@@ -1,6 +1,7 @@
 import { BadRequestRpcException } from './../../../libs/shared/src/filters/custom-rpc-exception/custm-rpc-exception';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import {
+  REFERRAL_SERVICE,
   SCORE_SERVICE,
   USER_SERVICE,
 } from '@app/shared/constants/name-microservice';
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     @Inject(USER_SERVICE) private userClient: ClientRMQ,
     @Inject(SCORE_SERVICE) private scoreClient: ClientRMQ,
+    @Inject(REFERRAL_SERVICE) private referralClient: ClientRMQ,
   ) {}
 
   async login(dto: LoginDto) {
@@ -69,6 +71,17 @@ export class AuthService {
     const addScore = await this.scoreClient
       .emit({ cmd: KEYS_RQM.ADD_POINTS_TO_USER }, { userId: user.id, score: 1 })
       .toPromise();
+
+    if (dto.referralCode) {
+      const referral = await this.referralClient
+        .emit(
+          { cmd: KEYS_RQM.USE_REFERRAL },
+          { userId: user.id, referralCode: dto.referralCode },
+        )
+        .toPromise();
+      console.log(`referralCount >> ${referral}`);
+      console.log('Points added to user:', user.id);
+    }
     const token = await this.generateToken(user);
     return { token };
   }

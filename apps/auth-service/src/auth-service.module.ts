@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserService } from 'apps/user-service/src/services/user-service.service';
 import { RmqModule } from '@app/shared/rmq/rmq.module';
 import {
+  REFERRAL_SERVICE,
   SCORE_SERVICE,
   USER_SERVICE,
 } from '@app/shared/constants/name-microservice';
@@ -34,6 +35,9 @@ import { RpcToHttpExceptionFilter } from '@app/shared/filters/rpc.exception';
     }),
     RmqModule.register({
       name: SCORE_SERVICE,
+    }),
+    RmqModule.register({
+      name: REFERRAL_SERVICE,
     }),
     AuthModule,
   ],
