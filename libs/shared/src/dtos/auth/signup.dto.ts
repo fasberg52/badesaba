@@ -1,7 +1,13 @@
 import { UserEntity } from '@app/shared/entities/user.entity';
-import { PickType } from '@nestjs/swagger';
+import { ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class SignupDto extends PickType(UserEntity, [
   'phone',
   'password',
-] as const) {}
+] as const) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  referralCode?: string;
+}

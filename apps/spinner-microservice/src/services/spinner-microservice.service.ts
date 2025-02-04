@@ -19,7 +19,10 @@ import { UserPrizeEntity } from '@app/shared/entities/user-prize.entity';
 import { GetAllPrizesByUserDto } from '@app/shared/dtos/spinner/get-all-prizes.dto';
 import { applySortingToFindOptions } from '@app/shared/factory/sort.factory';
 import { PrizeEntity } from '@app/shared/entities/prize.entity';
-import { NotFoundRpcException, BadRequestRpcException } from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
+import {
+  NotFoundRpcException,
+  BadRequestRpcException,
+} from '@app/shared/filters/custom-rpc-exception/custm-rpc-exception';
 
 @Injectable()
 export class SpinnerMicroserviceService {
@@ -32,17 +35,21 @@ export class SpinnerMicroserviceService {
 
   async runSpinner(userId: number) {
     try {
+      console.log(`runSpinner >> ${userId}`);
       const user = await firstValueFrom(
         this.userClient.send({ cmd: KEYS_RQM.GET_USER_BY_ID }, userId),
       );
       if (!user) {
         throw new NotFoundRpcException('کاربر پیدا نشد!');
       }
+      console.log(`user >> ${JSON.stringify(user)}`);
 
       const userWithPrizes = await this.userPrizeRepository.find({
         where: { userId },
         relations: { prize: true },
       });
+
+      console.log(`userWithPrizes >> ${JSON.stringify(userWithPrizes)}`);
 
       //console.log(`userWithPrizes >> ${JSON.stringify(userWithPrizes)}`);
 
@@ -69,6 +76,19 @@ export class SpinnerMicroserviceService {
 
       console.log(`availablePrizes >>\\n ${JSON.stringify(availablePrizes)}`);
 
+      const currentScore = await firstValueFrom(
+        this.scoreClient.send({ cmd: KEYS_RQM.GET_SCORE_BY_USER_ID }, userId),
+      );
+      
+
+      if (currentScore.score < 1) {
+        throw new BadRequestRpcException(
+          'امتیاز کافی برای اجرای گردونه وجود ندارد',
+        );
+      }
+
+     
+
       const scoreUser = await firstValueFrom(
         this.scoreClient.send(
           { cmd: KEYS_RQM.LOWER_POINTS_FROM_USER },
@@ -76,10 +96,12 @@ export class SpinnerMicroserviceService {
         ),
       );
 
-      if (scoreUser.score <= 1) {
-        throw new BadRequestRpcException('امتیاز کافی برای اجرای گردونه وجود ندارد');
+      if (scoreUser.score < 0) {
+        throw new BadRequestRpcException(
+          'امتیاز کافی برای اجرای گردونه وجود ندارد',
+        );
       }
-
+      console.log(scoreUser.score);
       const totalWeight = availablePrizes.reduce((sum, p) => sum + p.weight, 0);
       console.log(`totalWeight >> ${totalWeight}`);
       const random = Math.random() * totalWeight;

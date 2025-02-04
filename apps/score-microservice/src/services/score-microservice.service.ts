@@ -55,8 +55,8 @@ export class ScoreMicroserviceService {
     }
   }
 
-  async getScoreByUserId(userId: number): Promise<ScoreEntity[]> {
-    const scoreUser = await this.scoreRepository.find({
+  async getScoreByUserId(userId: number): Promise<ScoreEntity> {
+    const scoreUser = await this.scoreRepository.findOne({
       where: { userId: userId },
       select: {
         score: true,
