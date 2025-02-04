@@ -23,11 +23,15 @@ export class ReferralService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async useReferral(referralDto: ReferralDto & { referredUserId: number }) {
+  async useReferral(referralCode: string, referredUserId: number) {
     const queryRunner = this.dataSource.createQueryRunner();
-
     try {
-      const { referredUserId, referralCode } = referralDto;
+      console.log(`referralCode >> ${JSON.stringify(referralCode)}`);
+      console.log(`referredUserId >> ${JSON.stringify(referredUserId)}`);
+
+      if (!referredUserId) {
+        throw new BadRequestRpcException('کاربر ارجاع شده وجود ندارد');
+      }
 
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -43,10 +47,16 @@ export class ReferralService {
       if (!referrer) {
         throw new BadRequestRpcException('کد معرف اشتباه است');
       }
+      console.log('Fetching user by ID:', referredUserId);
 
       const referredUser = await firstValueFrom(
-        this.userClient.send({ cmd: KEYS_RQM.GET_USER_BY_ID }, referredUserId),
+        this.userClient.send(
+          { cmd: KEYS_RQM.GET_USER_BY_ID },
+          { referredUserId },
+        ),
       );
+
+      console.log('referredUser:', referredUser);
 
       if (!referredUser) {
         throw new NotFoundRpcException('کاربر معرفی شده یافت نشد');
@@ -55,6 +65,7 @@ export class ReferralService {
       const existingReferral = await this.referralRepository.findOne({
         where: { referredId: referredUserId },
       });
+      console.log('existingReferral:', existingReferral);
 
       if (existingReferral) {
         throw new BadRequestRpcException('این کاربر قبلا معرفی شده است');
@@ -65,6 +76,8 @@ export class ReferralService {
         referredId: referredUser.id,
         referralDate: new Date(),
       });
+
+      console.log('referral+++ ', JSON.stringify(referral));
 
       await queryRunner.manager.save(referral);
 

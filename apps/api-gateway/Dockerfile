@@ -15,4 +15,6 @@ RUN npm run build api-gateway
 
 EXPOSE 3000
 
+EXPOSE 5672
+
 CMD ["npm", "run", "start:api-gateway"]

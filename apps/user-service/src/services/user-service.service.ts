@@ -7,17 +7,20 @@ import { BadRequestRpcException } from '@app/shared/filters/custom-rpc-exception
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
   async createUser(dto: Partial<UserEntity>) {
+    if (!dto.password) {
+      throw new BadRequestRpcException('رمز عبور اجباری است');
+    }
+
+    dto.password = await bcrypt.hash(dto.password, 10);
+
+    console.log(dto);
     if (!dto.referralCode) {
       dto.referralCode = Math.random()
         .toString(36)
         .substring(2, 10)
         .toUpperCase();
     }
-    if (!dto.password) {
-      throw new BadRequestRpcException('رمز عبور اجباری است');
-    }
 
-    dto.password = await bcrypt.hash(dto.password, 10);
     const user = await this.userRepository.createUser({
       ...dto,
     });
@@ -34,7 +37,6 @@ export class UserService {
     console.log('User by phone:', user);
     return user ?? null;
   }
-
 
   async getUserByReferralCode(referralCode: string) {
     const user = await this.userRepository.findOneBy({ referralCode });

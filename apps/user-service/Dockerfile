@@ -15,6 +15,8 @@ RUN npm run build user-service
 
 EXPOSE 3001
 
+EXPOSE 5672
+
 
 
 CMD ["npm", "run", "start:user-service"]

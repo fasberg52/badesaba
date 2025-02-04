@@ -28,9 +28,10 @@ export class UserServiceController {
   }
 
   @MessagePattern({ cmd: KEYS_RQM.GET_USER_BY_ID })
-  async getUserById(@Payload() data: number) {
+  async getUserById(@Payload() data: { referredUserId: number }) {
+    console.log(`data > ${JSON.stringify(data)}`);
     try {
-      return await this.userService.getUserById(data);
+      return await this.userService.getUserById(data.referredUserId);
     } catch (error) {
       throw error;
     }

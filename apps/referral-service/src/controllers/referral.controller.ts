@@ -9,9 +9,15 @@ export class ReferralController {
   constructor(private readonly referralService: ReferralService) {}
 
   @MessagePattern({ cmd: KEYS_RQM.USE_REFERRAL })
-  async useReferral(@Payload() data: ReferralDto & { referredUserId: number }) {
+  async useReferral(
+    @Payload() data: { referralCode: string; referredUserId: number },
+  ) {
     try {
-      return await this.referralService.useReferral(data);
+      console.log(`data ${JSON.stringify(data)}`);
+      return await this.referralService.useReferral(
+        data.referralCode,
+        data.referredUserId,
+      );
     } catch (error) {
       throw error;
     }

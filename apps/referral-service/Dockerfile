@@ -15,4 +15,6 @@ RUN npm run build referral-service
 
 EXPOSE 3003
 
+EXPOSE 5672
+
 CMD ["npm", "run", "start:referral-service"]

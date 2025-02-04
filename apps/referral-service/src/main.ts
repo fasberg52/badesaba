@@ -22,7 +22,7 @@ async function bootstrap() {
   app
     .startAllMicroservices()
     .then(() => {
-      console.log('Microservices are up and running');
+      console.log('Referral Microservices are up and running');
     })
     .catch((err) => {
       console.error('Error starting microservices', err);

@@ -15,4 +15,6 @@ RUN npm run build score-microservice
 
 EXPOSE 3004
 
+EXPOSE 5672
+
 CMD ["npm", "run", "start:score-microservice"]

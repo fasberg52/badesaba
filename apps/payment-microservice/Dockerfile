@@ -15,4 +15,6 @@ RUN npm run build payment-microservice
 
 EXPOSE 3006
 
+EXPOSE 5672
+
 CMD ["npm", "run", "start:payment-microservice"]

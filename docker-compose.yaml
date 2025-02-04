@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./apps/api-gateway/Dockerfile
     ports:
-      - '5000:3000'
+      - '3000:3000'
     environment:
       - PORT=3000
       - RMQ_URL=amqp://rabbitmq:5672
@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: ./apps/user-service/Dockerfile
     ports:
-      - '5001:3001'
+      - '3001:3001'
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
       - RMQ_USER_QUEUE=user-service
@@ -58,8 +58,7 @@ services:
       - rabbitmq
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev user-service"
+    command: 'npm run start:dev user-service'
 
   auth-service:
     image: auth-service
@@ -67,7 +66,7 @@ services:
       context: .
       dockerfile: ./apps/auth-service/Dockerfile
     ports:
-      - '5002:3002'
+      - '3002:3002'
 
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
@@ -85,9 +84,7 @@ services:
       - rabbitmq
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev auth-service"
-
+    command: 'npm run start:dev auth-service'
 
   referral-service:
     image: referral-service
@@ -95,7 +92,7 @@ services:
       context: .
       dockerfile: ./apps/referral-service/Dockerfile
     ports:
-      - '5003:3003'
+      - '3003:3003'
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
       - RMQ_REFERRAL_QUEUE=referral-service
@@ -111,8 +108,7 @@ services:
       - rabbitmq
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev referral-service"
+    command: 'npm run start:dev referral-service'
 
   score-microservice:
     image: score-microservice
@@ -120,7 +116,7 @@ services:
       context: .
       dockerfile: ./apps/score-microservice/Dockerfile
     ports:
-      - '5004:3004'
+      - '3004:3004'
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
       - RMQ_SCORE_QUEUE=score-service
@@ -136,8 +132,7 @@ services:
       - rabbitmq
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev score-microservice"
+    command: 'npm run start:dev score-microservice'
 
   spinner-microservice:
     image: spinner-microservice
@@ -145,7 +140,7 @@ services:
       context: .
       dockerfile: ./apps/spinner-microservice/Dockerfile
     ports:
-      - '5005:3005'
+      - '3005:3005'
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
       - RMQ_SPINNER_QUEUE=spinner-service
@@ -161,8 +156,7 @@ services:
       - rabbitmq
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev spinner-microservice"
+    command: 'npm run start:dev spinner-microservice'
 
   payment-microservice:
     image: payment-microservice
@@ -170,7 +164,7 @@ services:
       context: .
       dockerfile: ./apps/payment-microservice/Dockerfile
     ports:
-      - '5006:3006'
+      - '3006:3006'
     environment:
       - RMQ_URL=amqp://rabbitmq:5672
       - RMQ_PAYMENT_QUEUE=payment-service
@@ -190,8 +184,7 @@ services:
       - redis
     networks:
       - badesaba-network
-    command: >
-      sh -c "wait-for-it rabbitmq:5672 -- npm run start:dev payment-microservice"
+    command: 'npm run start:dev payment-microservice'
 
   postgres:
     image: postgres:latest

@@ -58,11 +58,13 @@ export class AuthService {
     if (existingUser)
       throw new BadRequestRpcException('این کاربر از قبل وجود دارد');
     console.log('Creating user:', dto);
+    const { referralCode, ...userDto } = dto;
+
     const user = await this.userClient
       .send(
         { cmd: 'createUser' },
         {
-          ...dto,
+          ...userDto,
           role: UserRoleEnum.USER,
         },
       )
@@ -76,7 +78,7 @@ export class AuthService {
       const referral = await this.referralClient
         .emit(
           { cmd: KEYS_RQM.USE_REFERRAL },
-          { userId: user.id, referralCode: dto.referralCode },
+          { referralCode: dto.referralCode, referredUserId: user.id },
         )
         .toPromise();
       console.log(`referralCount >> ${referral}`);
