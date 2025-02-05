@@ -1,4 +1,4 @@
-import { AuthContoller } from './../../api-gateway/src/controllers/auth.controller';
+import { AuthContoller } from '../../api-gateway/src/controllers/auth.controller';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import { LoginDto } from '@app/shared/dtos/auth/login.dto';
 import { SignupDto } from '@app/shared/dtos/auth/signup.dto';
@@ -16,7 +16,7 @@ export class AuthController {
     try {
       return await this.authService.login(data);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -27,7 +27,7 @@ export class AuthController {
       return await this.authService.signup(data);
     } catch (error) {
       console.error('Error during signup:', error);
-      throw error
+      throw error;
     }
   }
 }

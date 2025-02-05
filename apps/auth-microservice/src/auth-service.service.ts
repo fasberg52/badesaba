@@ -1,4 +1,4 @@
-import { BadRequestRpcException } from './../../../libs/shared/src/filters/custom-rpc-exception/custm-rpc-exception';
+import { BadRequestRpcException } from '../../../libs/shared/src/filters/custom-rpc-exception/custm-rpc-exception';
 import { KEYS_RQM } from '@app/shared/constants/keys.constant';
 import {
   REFERRAL_SERVICE,

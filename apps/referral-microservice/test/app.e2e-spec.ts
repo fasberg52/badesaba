@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ReferralServiceModule } from './../src/referral-service.module';
+import { ReferralServiceModule } from '../src/referral-service.module';
 
 describe('ReferralServiceController (e2e)', () => {
   let app: INestApplication;

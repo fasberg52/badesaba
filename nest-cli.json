@@ -82,22 +82,22 @@
         "tsConfigPath": "libs/auth/tsconfig.lib.json"
       }
     },
-    "auth-service": {
+    "auth-microservice": {
       "type": "application",
-      "root": "apps/auth-service",
+      "root": "apps/auth-microservice",
       "entryFile": "main",
-      "sourceRoot": "apps/auth-service/src",
+      "sourceRoot": "apps/auth-microservice/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth-service/tsconfig.app.json"
+        "tsConfigPath": "apps/auth-microservice/tsconfig.app.json"
       }
     },
-    "referral-service": {
+    "referral-microservice": {
       "type": "application",
-      "root": "apps/referral-service",
+      "root": "apps/referral-microservice",
       "entryFile": "main",
-      "sourceRoot": "apps/referral-service/src",
+      "sourceRoot": "apps/referral-microservice/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/referral-service/tsconfig.app.json"
+        "tsConfigPath": "apps/referral-microservice/tsconfig.app.json"
       }
     },
     "score-microservice": {

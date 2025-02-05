@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": false,
     "strict": true,
-    "outDir": "../../dist/apps/auth-service",
+    "outDir": "../../dist/apps/auth-microservice",
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
