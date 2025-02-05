@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": false,
     "strict": true,
-    "outDir": "../../dist/apps/user-service",
+    "outDir": "../../dist/apps/user-microservice",
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],

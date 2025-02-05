@@ -18,7 +18,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ClientRMQ, RpcException } from '@nestjs/microservices';
-import { UserService } from 'apps/user-service/src/services/user-service.service';
+import { UserService } from 'apps/user-microservice/src/services/user-service.service';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom, lastValueFrom, Observable, retry } from 'rxjs';
 

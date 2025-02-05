@@ -19,13 +19,13 @@
         "tsConfigPath": "apps/gardone/tsconfig.app.json"
       }
     },
-    "user-service": {
+    "user-microservice": {
       "type": "application",
-      "root": "apps/user-service",
+      "root": "apps/user-microservice",
       "entryFile": "main",
-      "sourceRoot": "apps/user-service/src",
+      "sourceRoot": "apps/user-microservice/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/user-service/tsconfig.app.json"
+        "tsConfigPath": "apps/user-microservice/tsconfig.app.json"
       }
     },
     "api-gateway": {

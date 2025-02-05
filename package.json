@@ -14,7 +14,7 @@
     "start:prod": "node dist/apps/gardone/main",
     "start:api-gateway": "nest start api-gateway --watch",
     "start:auth-service": "nest start auth-service --watch",
-    "start:user-service": "nest start user-service --watch",
+    "start:user-microservice": "nest start user-microservice --watch",
     "start:referral-service": "nest start referral-service --watch",
     "start:score-microservice": "nest start score-microservice --watch",
     "start:spinner-microservice": "nest start spinner-microservice --watch",

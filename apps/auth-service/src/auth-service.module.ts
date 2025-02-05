@@ -3,7 +3,7 @@ import { AuthController } from './auth-service.controller';
 import { AuthService } from './auth-service.service';
 import { AuthModule } from '@app/auth';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserService } from 'apps/user-service/src/services/user-service.service';
+import { UserService } from 'apps/user-microservice/src/services/user-service.service';
 import { RmqModule } from '@app/shared/rmq/rmq.module';
 import {
   REFERRAL_SERVICE,
