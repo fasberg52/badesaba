@@ -12,16 +12,6 @@ async function bootstrap() {
 
   app.connectMicroservice<RmqOptions>(rmqService.getOptions('AUTH', true));
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-
   await app.startAllMicroservices();
-  await app.listen(process.env.AUTH_SERVICE_PORT ?? 3002);
-  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

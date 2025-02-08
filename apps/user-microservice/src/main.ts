@@ -3,6 +3,7 @@ import { UserServiceModule } from './user-service.module';
 import {
   MicroserviceOptions,
   RmqOptions,
+  RmqStatus,
   Transport,
 } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
@@ -13,16 +14,9 @@ async function bootstrap() {
   const app = await NestFactory.create(UserServiceModule);
   const rmqService = app.get<RmqService>(RmqService);
 
-  app.connectMicroservice<RmqOptions>(rmqService.getOptions('USER', true));
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
+  const server = app.connectMicroservice<RmqOptions>(
+    rmqService.getOptions('USER', true),
   );
-  app.useGlobalFilters(new RpcToHttpExceptionFilter());
 
   app
     .startAllMicroservices()
@@ -32,7 +26,5 @@ async function bootstrap() {
     .catch((err) => {
       console.error('Error starting microservices', err);
     });
-  await app.listen(process.env.USER_SERVICE_PORT ?? 3001);
-  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

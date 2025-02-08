@@ -36,9 +36,11 @@ export class AuthContoller {
     try {
       const result = await firstValueFrom(
         this.authClient.send({ cmd: KEYS_RQM.USER_LOGIN }, data).pipe(
-          timeout(5000),
+          timeout(10000),
           retry(2),
           catchError((err) => {
+            console.log(err);
+
             if (err instanceof TimeoutError) {
               return throwError(
                 () => new RpcException('internal server error'),
@@ -50,7 +52,7 @@ export class AuthContoller {
       );
       return new TokenResponse(result.token);
     } catch (error) {
-      console.log('erorr heereeeeeeee');
+      console.log('erorr heereeeeeeee' + error);
       throw error;
     }
   }

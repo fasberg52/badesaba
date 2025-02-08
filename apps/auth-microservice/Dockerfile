@@ -8,10 +8,6 @@ RUN npm install --force
 
 COPY . .
 
-RUN npm run build auth-service
+RUN npm run build auth-microservice
 
-EXPOSE 3002
-
-EXPOSE 5672
-
-CMD ["npm", "run", "start:auth-service"]
+CMD ["npm", "run", "start:auth-microservice"]
